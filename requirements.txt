@@ -1,0 +1,22 @@
+# ----------------------------------------------------------------------------
+# creating and running notebooks
+# ----------------------------------------------------------------------------
+
+jupytext
+ipykernel
+notebook
+
+# ----------------------------------------------------------------------------
+# machine learning and plotting
+# ----------------------------------------------------------------------------
+
+# Install manually before for CPU-only version. See README for details.
+torch
+
+##torchvision
+seaborn
+mnist1d
+scikit-learn
+torchinfo
+
+# vim:syn=conf
