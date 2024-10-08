@@ -1,6 +1,6 @@
 # Teaching material for the course "AI for Optimization and Control" at the 2024 THRILL Summer School, Hyères, France
 
-https://indico.gsi.de/event/19869/
+Event details: https://indico.gsi.de/event/19869/
 
 This is Part II of the Machine Learning course: https://github.com/elcorto/2024-thrill-school-machine-learning.git. 
 
@@ -10,7 +10,7 @@ This is Part II of the Machine Learning course: https://github.com/elcorto/2024-
 
 =============================================
 
-[Skip if you've done the following already!]
+[Skip if you've done the Python installation already!]
 
 > [!IMPORTANT]
 > Please install the software components as described below **before** the
