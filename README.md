@@ -1,40 +1,109 @@
-# AutomatedExperiment_Summer2023
-The summer training course on the Bayesian Optimization for Automated Experiment
+# Teaching material for the course "AI for Optimization and Control" at the 2024 THRILL Summer School, Hyères, France
 
-1.	The tentative outline of the course is as following:
-   
-a.	Gaussian processes and Bayesian Optimization, July 6
+https://indico.gsi.de/event/19869/
 
-b.	Bayesian Inference and structured Gaussian Processes, July 13
+This is Part II of the Machine Learning course: https://github.com/elcorto/2024-thrill-school-machine-learning.git. 
 
-c.	Hypothesis learning and GP, sGP, and HL beyond 1D, July 20
+## Note!
 
-d.	Manifold learning, variational autoencoders, and encoders-decoders, July 27
+[8 October 2024] This material is still being updated as of this date. For the final version for the summer school, please download or re-download on 10 October 2024 (Thursday) at 12 nn onwards. However, you can follow the installation instructions for now.
 
-e.	Deep Kernel Learning, August 3
+## Installation instructions for local execution
 
-f.	DKL, explainable automated experiments, and human in the loop AE, August 10
+=============================================
+[!Skip if you've done the following already!]
 
-g.	Multifidelity structured GP, August 17
+> [!IMPORTANT]
+> Please install the software components as described below **before** the
+> course and try to make sure that things work. If you run into problems, we
+> will of course help you fix them on day 1 of course, but the goal is that
+> most learners have their a software setup ready to go.
 
-2.	Why do I organize this tutorial:
 
-a.	In my experience, the best books on Bayesian optimization (e.g. Roman Garnett https://bayesoptbook.com/) tend to be focused on the fairly abstract concepts and written from purely data science perspective. They are super-useful, but tend to require considerable efforts to connect to real-world applications and especially code implementations.
+* If you don't have a local Python installation, try
+  [miniconda](https://docs.anaconda.com/miniconda) or install Python with
+  [`uv`](https://docs.astral.sh/uv)
+  by
+  * first [installing `uv`
+    itself](https://docs.astral.sh/uv/getting-started/installation/)
+  * [use `uv python install`](https://docs.astral.sh/uv/guides/install-python/)
 
-b.	The book by Quan Nguen https://www.manning.com/books/bayesian-optimization-in-action is a very good one and I strongly recommend it if one wants to stick to BOTorch, but going beyond zero mean function models in BOTorch is non trivial and requires dedicated background and SDE experience 
+  Both `miniconda` and `uv` work on MacOS, Linux and Windows.
 
-c.	Hence, purpose 1 is to introduce the GP and BO from physicists perspective, and
+==============================================
 
-d.	Purpose 2 is to provide some hands-on training in the use of the GPax library by Maxim Ziatdinov that is developed to be scikit-learn easy to use collection of GP methods for the specific problems emerging in the context of AE
+* create a `venv`: [!If you want to use your existing environment from Part 1.]
+  * if you installed Python via `uv`
 
-e.	Given that the field develops fast, I expect that many of these methods will become easy to use in the future via BOTorch or similar libraries. 
+    ```sh
+    uv venv thrill24
+    source thrill24/bin/activate
+    ```
 
-3.	If you are already attending the virtual summer school on machine learning in microscopy, it makes less sense to attend these tutorials (it will cover many of similar topics, albeit on somewhat more basic level). However, due to the limits on the Zoom registrations, we cannot add attendees to the summer school.
+  * else
 
-4.	It may be useful to attend these tutorials if:
+    ```sh
+    python -m venv thrill24
+    source thrill24/bin/activate
+    ```
 
-a.	You are planning to use the Bayesian optimization methods for automated experiment in synthesis or characterization hands on, and
+* OR create a new `venv`: [!If you want to create a separate enviroment.]
+  * if you installed Python via `uv`
 
-b.	You would like to develop the intuition for Bayesian methods from physicists perspective. For example, noise priors matter – and they correspond to the expected performance of your instrument, there are reasons why very greedy algorithms are suboptimal and learning models via mean functions is useful, and so on.
+    ```sh
+    uv venv thrill24-bo
+    source thrill24-bo/bin/activate
+    ```
 
-c.	And you would like explore the tuning of these algorithms for specific problems (contrary from usual belief, GP BO do not necessarily converge to the right answer – at least in the experimentally realizable number of steps)
+  * else
+
+    ```sh
+    python -m venv thrill24-bo
+    source thrill24-bo/bin/activate
+    ```
+
+* Clone this repo: `git clone https://github.com/ritzann/2024-thrill-school-gp-bo.git`
+* Change into the repo root folder: `cd 2024-thrill-school-gb-bo`
+* [!For the new environment, you can skip `torch` installation unless you want to use [`BoTorch`](https://botorch.org/) in the future.]
+* (optional) Install CPU-only [`torch`](https://pytorch.org/) (all code
+  examples use small models and a toy dataset, so running on a laptop without a
+  GPU is fine)
+
+  ```sh
+  uv pip install --extra-index-url https://download.pytorch.org/whl/cpu torch
+  ```
+
+  or
+
+  ```sh
+  python -m pip install --extra-index-url https://download.pytorch.org/whl/cpu torch
+  ```
+
+* install all other requirements via 
+
+  ```sh
+  uv pip install -r ./requirements.txt
+  ```
+
+  or
+
+  ```sh
+  python -m pip install -r ./requirements.txt
+  ```
+
+
+## NOTES
+
+This repo has a small utility prepared which can check if you software
+environment is ready. Either run
+
+```sh
+python notebooks/00_intro2ml_envcheck.py
+```
+
+or open the paired notebook `notebooks/00_intro2ml_envcheck.ipynb` with
+Jupyter, read the instructions and execute all cells.
+
+# Teaching this material
+
+If you are an instructor, please see the [instructor notes](FOR_INSTRUCTORS.md).
