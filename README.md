@@ -8,9 +8,9 @@ This is Part II of the Machine Learning course: https://github.com/elcorto/2024-
 
 ## Installation instructions for local execution
 
-=============================================
+=====================================================
 
-[Skip if you've done the Python installation already!]
+[Skip if you've done the Python installation already.]
 
 > [!IMPORTANT]
 > Please install the software components as described below **before** the
@@ -29,7 +29,7 @@ This is Part II of the Machine Learning course: https://github.com/elcorto/2024-
 
   Both `miniconda` and `uv` work on MacOS, Linux and Windows.
 
-==============================================
+======================================================
 
 * create a `venv`: [If you want to use your existing environment from Part 1.]
   * if you installed Python via `uv`
