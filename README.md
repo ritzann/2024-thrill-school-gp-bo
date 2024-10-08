@@ -4,14 +4,13 @@ https://indico.gsi.de/event/19869/
 
 This is Part II of the Machine Learning course: https://github.com/elcorto/2024-thrill-school-machine-learning.git. 
 
-## Note!
-
 [8 October 2024] This material is still being updated as of this date. For the final version for the summer school, please download or re-download on 10 October 2024 (Thursday) at 12 nn onwards. However, you can follow the installation instructions for now.
 
 ## Installation instructions for local execution
 
 =============================================
-[!Skip if you've done the following already!]
+
+[Skip if you've done the following already!]
 
 > [!IMPORTANT]
 > Please install the software components as described below **before** the
@@ -32,7 +31,7 @@ This is Part II of the Machine Learning course: https://github.com/elcorto/2024-
 
 ==============================================
 
-* create a `venv`: [!If you want to use your existing environment from Part 1.]
+* create a `venv`: [If you want to use your existing environment from Part 1.]
   * if you installed Python via `uv`
 
     ```sh
@@ -47,7 +46,7 @@ This is Part II of the Machine Learning course: https://github.com/elcorto/2024-
     source thrill24/bin/activate
     ```
 
-* OR create a new `venv`: [!If you want to create a separate enviroment.]
+* OR create a new `venv`: [If you want to create a separate enviroment.]
   * if you installed Python via `uv`
 
     ```sh
