@@ -103,7 +103,7 @@ def plot_heatmap(ax, param1_grid, param2_grid, Y_pred, params_init, Y_init,
     """
     heatmap = ax.imshow(Y_pred, extent=(param1_grid.min(), param1_grid.max(),
                                         param2_grid.min(), param2_grid.max()),
-                        origin='lower', aspect='auto', cmap='viridis')
+                        origin='lower', aspect='auto', cmap='coolwarm')
     ax.scatter(params_init[:, 0], params_init[:, 1], c='red', label='Initial Samples')
     ax.scatter(param1_next, param2_next, c='blue', marker='x', s=100, label='Next Sample')
     ax.set_xlabel(param1_label)
