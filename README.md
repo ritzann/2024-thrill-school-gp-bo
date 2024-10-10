@@ -4,7 +4,7 @@ Event details: https://indico.gsi.de/event/19869/
 
 This is Part II of the Machine Learning course: https://github.com/elcorto/2024-thrill-school-machine-learning.git. 
 
-[8 October 2024] This material is still being updated as of this date. For the final version for the summer school, please download or re-download on 10 October 2024 (Thursday) at 12 nn onwards. However, you can follow the installation instructions for now.
+[10 October 2024] This material is still being updated as of this date. For the final version for the summer school, please download or re-download on 11 October 2024 (Friday) at 9 am onwards. However, you can follow the installation instructions for now.
 
 ## Installation instructions for local execution
 
@@ -90,19 +90,3 @@ This is Part II of the Machine Learning course: https://github.com/elcorto/2024-
   python -m pip install -r ./requirements.txt
   ```
 
-
-## NOTES
-
-This repo has a small utility prepared which can check if you software
-environment is ready. Either run
-
-```sh
-python notebooks/00_intro2ml_envcheck.py
-```
-
-or open the paired notebook `notebooks/00_intro2ml_envcheck.ipynb` with
-Jupyter, read the instructions and execute all cells.
-
-# Teaching this material
-
-If you are an instructor, please see the [instructor notes](FOR_INSTRUCTORS.md).
