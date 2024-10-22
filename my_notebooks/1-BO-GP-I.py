@@ -11,7 +11,7 @@
 # - Learn some of the acquisition/utility functions used in BO.
 
 # #### Definition
-# **Bayesian Optimization** is a global optimization method used for optimizing black-box functions that are expensive to evaluate, common in control and machine learning applications.
+# **Bayesian Optimization** is a global optimization method used for optimizing black-box functions that are expensive to evaluate, common in control and machine learning applications [[1]](https://arxiv.org/pdf/1012.2599).
 # 
 # 
 # - **Problem**: We have an objective function $f(x)$, but we don't know its form and each evaluation is costly and/or noisy as in real-world problems. Our goal is to find the minimum of this noisy function: 
@@ -31,7 +31,8 @@
 
 
 ## Uncomment to install the following library in your environment
-# !pip install scikit-learn
+## You can also open a terminal with your activated environment and do "pip install scipy" 
+# !pip install scipy
 
 
 # In[2]:
@@ -41,10 +42,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process.kernels import RBF, Matern, ConstantKernel as C
+from sklearn.gaussian_process.kernels import RBF, Matern, ConstantKernel as C, WhiteKernel
 # from sklearn.model_selection import train_test_split
 # from sklearn.metrics import mean_squared_error
 from scipy.optimize import minimize
+
+np.random.seed(42)
 
 
 # ## Gaussian Processes (GP) Regression
@@ -58,9 +61,8 @@ from scipy.optimize import minimize
 # In[3]:
 
 
-np.random.seed(12)
+noise_level = 1.0
 
-noise_level = 0.25
 def f(x, noise_level=noise_level):
     return -np.exp(-x) * np.sin(4 * x) + np.random.randn(*x.shape) * noise_level
 
@@ -76,7 +78,7 @@ Y = f(X, noise_level=0)
 
 # #### Create training data
 # 
-# Let's say our training data has 5 initial samples (observations).
+# Let's say our training data has 3 initial samples (observations).
 
 # In[5]:
 
@@ -118,12 +120,14 @@ Question: Does this remind you of a physical phenomenon?
 
 # Define the kernel: Constant kernel * RBF kernel
 kern_crbf = C(1.0) * RBF(length_scale=1.0, length_scale_bounds=(1e-2, 1e2))
-kern_cm = C(1.0) * Matern(length_scale=1.0, nu=2.5)
+kern_cm = C(1.0) * Matern(length_scale=1.0, nu=2.5) + WhiteKernel(noise_level=noise_level, noise_level_bounds='fixed')
 
 # Use GP as a surrogate model
-gp = GaussianProcessRegressor(kernel=kern_cm, n_restarts_optimizer=9, alpha=noise_level**2)
+# gp = GaussianProcessRegressor(kernel=kern_cm, n_restarts_optimizer=9, alpha=noise_level**2, random_state=42)
+gp = GaussianProcessRegressor(kernel=kern_cm, n_restarts_optimizer=9, random_state=42)
 
-# Fit the GP model to your training data
+
+# Fit the GP model to your training data 
 gp.fit(X_init, Y_init)
 
 
@@ -132,8 +136,6 @@ gp.fit(X_init, Y_init)
 # In[8]:
 
 
-# # Predict at new data points
-# X_new = np.linspace(-2, 2, 100).reshape(-1, 1)
 Y_pred, sigma = gp.predict(X, return_std=True)
 
 
@@ -145,7 +147,7 @@ Y_pred, sigma = gp.predict(X, return_std=True)
 
 
 # Plotting the GP predictions
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(8, 4))
 
 plt.plot(X, Y, c='#FF4500', ls=':', lw=2.5, label=r'ground truth')
 plt.errorbar(X_init.flatten(), Y_init.flatten(), yerr=noise_level, 
@@ -168,27 +170,11 @@ plt.show()
 
 # **Exercise 1.1** Adjust the number of observation data points to see how it affects the GP’s confidence.
 
-# ##### Sol 1.1
-
-# In[ ]:
-
-
-
-
-
 # **Exercise 1.2** Play around with different noise levels and see how it affects the measured value.
-
-# ##### Sol 1.2
-
-# In[ ]:
-
-
-
-
 
 # #### Exercise 2: Bayesian Optimization Loop
 # 
-# To optimize the objective function iteratively, we follow the steps outlined below for $t = 1, 2, \ldots, T$:
+# To optimize the objective function iteratively, we follow the steps outlined below for $t = 1, 2, \ldots, T$ [[2]](https://scikit-optimize.github.io/stable/auto_examples/bayesian-optimization.html), [[3]](https://sassafras13.github.io/BayesianOptimization):
 # 
 # 1. **Construct a Probabilistic Model**: Start with the observations $x_i, y_i = f(x_i)$ for $i = 1:t$ to build a probabilistic model of the objective function $f$. This involves integrating over all possible true functions using GP regression.
 # 
@@ -200,15 +186,12 @@ plt.show()
 # 
 # 4. **Update the Surrogate Model**: Update the surrogate function $g(\cdot)$ to incorporate the newly sampled point $(x_{t+1}, y_{t+1})$.
 # 
-# References: 
-# 1. https://scikit-optimize.github.io/stable/auto_examples/bayesian-optimization.html
-# 2. https://sassafras13.github.io/BayesianOptimization/
 
 # #### Define the Utitilty Function
 # 
-# One of the most commonly used utility functions used in BO is *Expected Improvement (EI)*, which we will first briefly look into. A deeper dive into these acquisition functions will be discussed in Part II.
+# One of the most commonly used utility functions in BO is *Expected Improvement (EI)*, which we will first briefly look into. A deeper dive into these acquisition functions will be discussed in Part II.
 # 
-# EI measures the expected amount of improvement over the best-observed value so far during GP regression, balancing both uncertainty and the predicted value. It is formulated as [[3]](https://github.com/krasserm/bayesian-machine-learning):
+# EI measures the expected amount of improvement over the best-observed value so far during GP regression, balancing both uncertainty and the predicted value. It is formulated as [[4]](https://github.com/krasserm/bayesian-machine-learning):
 # 
 # $$\mathrm{EI}(\mathbf{x}) = \mathbb{E}\max(f(\mathbf{x}) - f(\mathbf{\hat{x}}), 0),\tag{1}$$
 # 
@@ -259,9 +242,11 @@ def expected_improvement(X, X_train, Y_train, gp, xi=0.01):
         Computed Expected Improvement values at locations X.
         
     '''
-    mu, sigma = gp.predict(X, return_std=True)  # Predict mean and standard deviation
+    # Predict mean and standard deviation
+    mu, sigma = gp.predict(X, return_std=True)  
     mu_train = gp.predict(X_train)
-    sigma = sigma.reshape(-1, 1)  # Ensure sigma is reshaped as a column vector
+    # Ensure sigma is reshaped as a column vector
+    sigma = sigma.reshape(-1, 1)  
     # print("mu, sigma:", mu.shape, sigma.shape)
     
     # For noise models or use np.max(Y_train) for noiseless scenarios
@@ -280,7 +265,7 @@ def expected_improvement(X, X_train, Y_train, gp, xi=0.01):
     return ei.flatten()
 
 
-# Note: The parameter $\xi$ is to $0.01$ above as a default as it is commonly used in most literatures.
+# Note: The parameter $\xi$ is to $0.01$ above as a default as it is commonly used in most literatures. As with the other parameters, you can also play around with its value.
 
 # In[11]:
 
@@ -397,7 +382,7 @@ def plot_convergence(ax, X_train, Y_train, n_init=2, show_legend=False):
     plt.tight_layout()
 
 
-# We now do our BO loop over 15 iterations and plot the prediction plus utility function. Notice how  
+# We now do our BO loop over 10 iterations and plot the prediction plus utility function.  
 
 # In[13]:
 
@@ -436,16 +421,20 @@ for i in range(n_iter):
     Y_train = np.vstack((Y_train, Y_next))
 
 
-# ##### Exercise 2.1
+# #### Exercise 2.1
 # 
 # Write down your observations for the plots above.
 
-# Solution 2.1: Possible answers:
+# #### Solution 2.1
+
+# Possible answers
 # - At the start, the GP model explores a lot by searching unknown regions, specifically near the crests and troughs of our ground truth.
 # - The GP then exploits the specific region by sampling several points near it. In this case, the exploited values are $X_{t+1} = X_{t} \pm 0.00650000$.
 # - The utility functions show multi-modal distributions and samples the next point with the highest mean and least standard deviation.
 
-# We plot the convergence. Notice the iteration number at which the plot for the Best Y vs. Iteration number plateaus.
+# #### Convergence Plots
+
+# We plot the distance between consecutive sample x's and best Y value as a function of the number of iterations. Notice the iteration number at which the plots plateau.
 
 # In[14]:
 
@@ -457,99 +446,27 @@ plt.show()  # Display the plots
 
 # #### Exercise 2.2
 # 
-# Increase the number of iterations to up to 15. Plot all the corresponding graphs and observe the changes. Write down your observations.
-
-# In[15]:
-
-
-# Number of iterations
-n_iter = 15
-
-X_train = X_init
-Y_train = Y_init
-
-fig, axes = plt.subplots(n_iter, 2, figsize=(12, n_iter * 3))
-plt.subplots_adjust(hspace=0.4)
-
-for i in range(n_iter):
-    # Update the Gaussian process with the current training data
-    gp.fit(X_train, Y_train)
-
-    # Suggest the next sampling point using the acquisition function (Expected Improvement)
-    X_next = suggest_next_sample(expected_improvement, X_train, Y_train, gp, bounds)
-    print(f'Iteration {i+1}\t X_next_value: {X_next}')
-    # Obtain the next (possibly noisy) sample from the objective function
-    Y_next = f(X_next, noise_level)
-    
-    # Plot the GP approximation, noisy samples, and the next sampling point
-    plot_prediction(axes[i, 0], gp, X, Y, X_train, Y_train, X_next, show_legend=(i == 0))
-    axes[i, 0].set_title(f'Iteration {i+1}')
-
-    # print("X.shape",X.shape,"X_train.shape",X_train.shape,"Y_train.shape:",Y_train.shape)
-    # Plot the acquisition (utility) function and the proposed next sample
-    ei_values = expected_improvement(X, X_train, Y_train, gp)
-    # print("ei_values.shape")
-    plot_utility(axes[i, 1], X, ei_values, X_next, show_legend=(i == 0))
-
-    # Add the new sample to the training set
-    X_train = np.vstack((X_train, X_next))
-    Y_train = np.vstack((Y_train, Y_next))
-
-
-fig, ax = plt.subplots(1, 2, figsize=(12, 3))  # Create subplots
-plot_convergence(ax, X_train, Y_train)
-plt.show()  # Display the plots
-
-
-# ### Using other libraries
-# We first put everything together and neatly into functions.
-
-def objective_function():
-    kernel = C(params[0], (1e-3, 1e3)) * RBF(params[1], (1e-2, 1e2))
-    gp = GaussianProcessRegressor(kernel=kernel)
-    gp.fit(X_train, y_train)
-    predictions = gp.predict(X_test)
-    return -mean_squared_error(y_test, predictions)
-
-kernel = C(1.0) * RBF(length_scale=1.0, length_scale_bounds=(1e-2, 1e2))
-gp = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=10, alpha=1e-2)
-
-# Fit the GP model to the sampled data
-gp.fit(X, Y)
-# ## Applications
-# 
-# Laser Control and Diagnostics
-# SVM, contour plots
+# Increase the number of iterations to up to 20. Plot all the corresponding graphs and observe the changes. Observe the changes in the plots of the prediction, utility functions, and convergence plots.
 
 # ## Extensions
 # 
 # There are other Python-based libraries offering more streamlined approaches to perform BO. These include:
-# - $\texttt{skopt}$ - built on top of $\texttt{numpy}$, $\texttt{scipy}$, and $\texttt{scikit-learn}$
-# - $\texttt{bayesian-optimization}$ - pure Python implementation of BO with GP
+# - [$\texttt{skopt}$](https://scikit-optimize.github.io/stable/index.html) - built on top of $\texttt{numpy}$, $\texttt{scipy}$, and $\texttt{scikit-learn}$
+# - [$\texttt{bayesian-optimization}$](https://bayesian-optimization.github.io/BayesianOptimization) - pure Python implementation of BO with GP
 # - [$\texttt{gpax}$](https://github.com/ziatdinovmax/gpax) - built on top of $\texttt{NumPyro}$ and $\texttt{JAX}$, allows for running on GPU; better to create a new environment for this one
-# - [$\texttt{BoTorch}$](https://botorch.org/) - built on top of  $\texttt{PyTorch}$
+# - [$\texttt{BoTorch}$](https://botorch.org/) - built on top of  $\texttt{PyTorch}$, allows for running on GPU; better to create a new environment for this one
 
-# In[16]:
+# Optional Exercise: Compare BO with Random or Grid Search. You may use any library for thi one.
 
-
-# !pip install bayesian-optimization
-
-
-# ### References
+# ### References and Further Reading
 # 
 # 1. [F. Nogueira (2014), Bayesian Optimization: Open source constrained global optimization tool for Python](https://bayesian-optimization.github.io/BayesianOptimization)
 # 2. [E. Lee (2023), Bayesian Optimization with Python](https://drlee.io/bayesian-optimization-with-python-b544255757d3)
 # 3. [S. V. Kalinin (2023), Bayesian Optimization for Automated Experiments](https://github.com/SergeiVKalinin/AutomatedExperiment_Summer2023)
-# 4. https://distill.pub/2020/bayesian-optimization/
+# 4. [A. Agnihotri & N. Batra (2020), “Exploring Bayesian Optimization”, Distill.](https://distill.pub/2020/bayesian-optimization/(https://distill.pub/2020/bayesian-optimization/)
 # 5. https://nbviewer.org/github/krasserm/bayesian-machine-learning/blob/dev/bayesian-optimization/bayesian_optimization.ipynb
-
+# 
 # ### Papers
 # 
 # 1. [J. Duris et al. (2020), Bayesian optimization of a free-electron laser, Phys. Rev. Letters.](https://arxiv.org/pdf/1909.05963)
-# 
-
-# In[ ]:
-
-
-
-
+# 2. [P. Frazier (2018), A Tutorial on Bayesian Optimization](https://arxiv.org/pdf/1807.02811)
