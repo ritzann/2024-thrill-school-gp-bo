@@ -61,7 +61,7 @@ This is Part II of the Machine Learning course: https://github.com/elcorto/2024-
     source thrill24-bo/bin/activate
     ```
 
-* Clone this repo: `git clone https://github.com/ritzann/2024-thrill-school-gp-bo.git`
+* Clone this repo: `git clone git@github.com:ritzann/2024-thrill-school-gp-bo.git`
 * Change into the repo root folder: `cd 2024-thrill-school-gb-bo`
 * [!For the new environment, you can skip `torch` installation unless you want to use [`BoTorch`](https://botorch.org/) in the future.]
 * (optional) Install CPU-only [`torch`](https://pytorch.org/) (all code
